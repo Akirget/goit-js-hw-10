@@ -1,29 +1,30 @@
 import './css/styles.css';
-import fetchCountries from './fetchCountries';
 import debounce from 'lodash.debounce';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import { fetchCountries } from './fetchCountries';
 
 const DEBOUNCE_DELAY = 300;
 
-const inputElement = document.getElementById('search-box');
-const listElement = document.querySelector('.country-list');
-const infoElement = document.querySelector('.country-info');
+const inputEl = document.getElementById('search-box');
+const listEl = document.querySelector('.country-list');
+const infoEl = document.querySelector('.country-info');
 
 const cleanMarkup = ref => (ref.innerHTML = '');
 
-const inputHandler = e => {
-  const textInput = e.target.value.trim();
+inputEl.addEventListener('input', debounce(inputHandler, DEBOUNCE_DELAY));
 
-  if (!textInput) {
-    cleanMarkup(listElement);
-    cleanMarkup(infoElement);
+function inputHandler(event) {
+  const textInput = event.target.value.trim();
+
+  if (textInput === '') {
+    cleanMarkup(listEl);
+    cleanMarkup(infoEl);
     return;
   }
 
   fetchCountries(textInput)
     .then(data => {
-      console.log(data);
-      if (data.length > 10) {
+      if (data.length > 3) {
         Notify.info(
           'Too many matches found. Please enter a more specific name'
         );
@@ -31,23 +32,22 @@ const inputHandler = e => {
       }
       renderMarkup(data);
     })
-    .catch(err => {
-      cleanMarkup(listElement);
-      cleanMarkup(infoElement);
+    .catch(error => {
+      cleanMarkup(listEl);
+      cleanMarkup(infoEl);
       Notify.failure('Oops, there is no country with that name');
     });
-};
-inputElement.addEventListener('input', debounce(inputHandler, DEBOUNCE_DELAY));
+}
 
 const renderMarkup = data => {
   if (data.length === 1) {
-    cleanMarkup(listElement);
+    cleanMarkup(listEl);
     const markupInfo = createInfoMarkup(data);
-    infoElement.innerHTML = markupInfo;
+    infoEl.innerHTML = markupInfo;
   } else {
-    cleanMarkup(infoElement);
+    cleanMarkup(infoEl);
     const markupList = createListMarkup(data);
-    listElement.innerHTML = markupList;
+    listEl.innerHTML = markupList;
   }
 };
 
