@@ -24,7 +24,7 @@ function inputHandler(event) {
 
   fetchCountries(textInput)
     .then(data => {
-      if (data.length > 3) {
+      if (data.length > 10) {
         Notify.info(
           'Too many matches found. Please enter a more specific name'
         );
